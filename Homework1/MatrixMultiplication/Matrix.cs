@@ -2,15 +2,30 @@ namespace MatrixMultiplication;
 
 using System.Text.RegularExpressions;
 
-
+/// <summary>
+/// Class that represents matrix and operations on it
+/// </summary>
 public class Matrix
 {
+    /// <summary>
+    /// Amount of rows in matrix.
+    /// </summary>
     public int RowsAmount { get; }
 
+    /// <summary>
+    /// Amount of columns in matrix.
+    /// </summary>
     public int ColumnsAmount { get; }
 
+    /// <summary>
+    /// Two-dimensional array that contains rows of matrix.
+    /// </summary>
     public int[,] MatrixElements { get; }
 
+    /// <summary>
+    /// Constructor of Matrix from file.
+    /// </summary>
+    /// <param name="matrixElements">Matrix's elements.</param>
     public Matrix(string pathToFile)
     {
         if (!File.Exists(pathToFile))
@@ -57,6 +72,10 @@ public class Matrix
         MatrixElements = matrixElements;
     }
 
+    /// <summary>
+    /// Constructor of Matrix from two-dimensional array.
+    /// </summary>
+    /// <param name="matrixElements">Matrix's elements.</param>
     public Matrix(int[,] matrixElements)
     {
         MatrixElements = (int[,])matrixElements.Clone();
@@ -64,6 +83,10 @@ public class Matrix
         ColumnsAmount = matrixElements.GetLength(1);
     }
 
+    /// <summary>
+    /// Writes matrix in file.
+    /// </summary>
+    /// <param name="pathToFile">Path to file where the matrix will be written.</param>
     public void WriteInFile(string pathToFile)
     {
         using (var writer = new StreamWriter(pathToFile))
@@ -79,6 +102,12 @@ public class Matrix
         }
     }
 
+    /// <summary>
+    /// Multiplies matrices.
+    /// </summary>
+    /// <param name="firstMatrix">First matrix for multiplying.</param>
+    /// <param name="secondMatrix">Second matrix for multiplying.</param>
+    /// <returns>Matrix obtained by multiplication of matrices.</returns>
     public static Matrix Multiply(Matrix firstMatrix, Matrix secondMatrix)
     {
         if (firstMatrix.ColumnsAmount != secondMatrix.RowsAmount)
@@ -102,6 +131,12 @@ public class Matrix
         return new Matrix(newMatrix);
     }
 
+    /// <summary>
+    /// Multiplies matrices in parallel.
+    /// </summary>
+    /// <param name="firstMatrix">First matrix for multiplying.</param>
+    /// <param name="secondMatrix">Second matrix for multiplying.</param>
+    /// <returns>Matrix obtained by multiplication of matrices.</returns>
     public static Matrix ParallelMultiply(Matrix firstMatrix, Matrix secondMatrix)
     {
         if (firstMatrix.ColumnsAmount != secondMatrix.RowsAmount)
