@@ -172,4 +172,25 @@ public class Matrix
 
         return new Matrix(newMatrix);
     }
+
+    public bool IsEqualTo(Matrix otherMatrix)
+    {
+        if (RowsAmount != otherMatrix.RowsAmount || ColumnsAmount != otherMatrix.ColumnsAmount)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < RowsAmount; ++i)
+        {
+            for (int j = 0; j < ColumnsAmount; ++j)
+            {
+                if (MatrixElements[i, j] != otherMatrix.MatrixElements[i, j])
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }
