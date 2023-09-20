@@ -11,7 +11,6 @@ public class Matrix
 
     public int[,] MatrixElements { get; }
 
-    // подумать
     public Matrix(string pathToFile)
     {
         if (!File.Exists(pathToFile))
@@ -27,24 +26,16 @@ public class Matrix
 
         foreach (var line in allLines)
         {
-            // try-catch?
-            try
-            {
-                var row = new Regex(@"-?\d+", RegexOptions.Compiled).Matches(line)
-                                        .Select(element => int.Parse(element.Value)).ToArray();
+            var row = new Regex(@"-?\d+", RegexOptions.Compiled).Matches(line)
+                                    .Select(element => int.Parse(element.Value)).ToArray();
 
-                if (columnsAmount != 0 && row.Length != columnsAmount)
-                {
-                    throw new ArgumentException("It is not matrix in your file!");
-                }
-
-                columnsAmount = row.Length;
-                matrix.Add(row);
-            }
-            catch (FormatException)
+            if (columnsAmount != 0 && row.Length != columnsAmount)
             {
                 throw new ArgumentException("It is not matrix in your file!");
             }
+
+            columnsAmount = row.Length;
+            matrix.Add(row);
         }
 
         if (matrix.Count == 0)
