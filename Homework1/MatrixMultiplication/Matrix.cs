@@ -46,7 +46,7 @@ public class Matrix
 
             if (columnsAmount != 0 && row.Length != columnsAmount)
             {
-                throw new ArgumentException("It is not matrix in your file!");
+                throw new ArgumentException($"It is not matrix in your file '{pathToFile}'!");
             }
 
             columnsAmount = row.Length;
