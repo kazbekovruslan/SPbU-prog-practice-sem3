@@ -43,10 +43,8 @@ public class Matrix
             }
             catch (FormatException)
             {
-                throw new ArgumentException("File doesn't contain a matrix!");
+                throw new ArgumentException("It is not matrix in your file!");
             }
-
-
         }
 
         if (matrix.Count == 0)
@@ -59,7 +57,7 @@ public class Matrix
         RowsAmount = rowsAmount;
         for (var i = 0; i < rowsAmount; ++i)
         {
-            for (var j = 0; j < columnsAmount; ++i)
+            for (var j = 0; j < columnsAmount; ++j)
             {
                 matrixElements[i, j] = matrix[i][j];
             }
@@ -90,29 +88,6 @@ public class Matrix
         }
     }
 
-    // public Matrix Multiply(Matrix secondMatrix)
-    // {
-    //     if (ColumnsAmount != secondMatrix.RowsAmount)
-    //     {
-    //         throw new ArgumentException("Dimensions are not suitable for multiplication!");
-    //     }
-
-    //     var newMatrix = new int[RowsAmount, secondMatrix.ColumnsAmount];
-
-    //     for (int i = 0; i < RowsAmount; ++i)
-    //     {
-    //         for (int j = 0; j < secondMatrix.ColumnsAmount; ++j)
-    //         {
-    //             for (int k = 0; k < ColumnsAmount; ++k)
-    //             {
-    //                 newMatrix[i, j] += MatrixElements[i, k] * secondMatrix.MatrixElements[k, j];
-    //             }
-    //         }
-    //     }
-
-    //     return new Matrix(newMatrix);
-    // }
-
     public static Matrix Multiply(Matrix firstMatrix, Matrix secondMatrix)
     {
         if (firstMatrix.ColumnsAmount != secondMatrix.RowsAmount)
@@ -138,7 +113,37 @@ public class Matrix
 
     public static Matrix ParallelMultiply(Matrix firstMatrix, Matrix secondMatrix)
     {
+        if (firstMatrix.ColumnsAmount != secondMatrix.RowsAmount)
+        {
+            throw new ArgumentException("Dimensions are not suitable for multiplication!");
+        }
 
+        var newMatrix = new int[firstMatrix.RowsAmount, secondMatrix.ColumnsAmount];
+
+        var threads = new Thread[firstMatrix.ColumnsAmount];
+        for (int i = 0; i < firstMatrix.RowsAmount; ++i)
+        {
+            var local = i;
+            threads[i] = new Thread(() =>
+            {
+                for (int j = 0; j < secondMatrix.ColumnsAmount; ++j)
+                {
+                    var sumForElement = 0;
+                    for (int k = 0; k < firstMatrix.ColumnsAmount; ++k)
+                    {
+                        sumForElement += firstMatrix.MatrixElements[local, k] * secondMatrix.MatrixElements[k, j];
+                    }
+                    newMatrix[local, j] = sumForElement;
+                }
+            });
+            threads[i].Start();
+        }
+
+        foreach (var thread in threads)
+        {
+            thread.Join();
+        }
+
+        return new Matrix(newMatrix);
     }
-
 }
