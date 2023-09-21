@@ -207,14 +207,14 @@ public class Matrix
     /// <returns>Matrix with given dimension and random numbers.</returns>
     public static Matrix GenerateRandomMatrix(int rowsAmount, int columnsAmount)
     {
-        var rand = new Random(100);
+        var rand = new Random();
 
         var matrixElements = new int[rowsAmount, columnsAmount];
         for (int i = 0; i < rowsAmount; ++i)
         {
             for (int j = 0; j < columnsAmount; ++j)
             {
-                matrixElements[i, j] = rand.Next();
+                matrixElements[i, j] = rand.Next(100);
             }
         }
 
