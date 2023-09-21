@@ -173,6 +173,11 @@ public class Matrix
         return new Matrix(newMatrix);
     }
 
+    /// <summary>
+    /// Checks if two matrices are equal.
+    /// </summary>
+    /// <param name="otherMatrix">Second matrix.</param>
+    /// <returns>true - if matrices are equal; false - if matrices aren't equal.</returns>
     public bool IsEqualTo(Matrix otherMatrix)
     {
         if (RowsAmount != otherMatrix.RowsAmount || ColumnsAmount != otherMatrix.ColumnsAmount)
@@ -192,5 +197,27 @@ public class Matrix
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Generates matrix with given dimension and random numbers.
+    /// </summary>
+    /// <param name="rowsAmount">Amount of rows in matrix.</param>
+    /// <param name="columnsAmount">Amount of columns in matrix.</param>
+    /// <returns>Matrix with given dimension and random numbers.</returns>
+    public static Matrix GenerateRandomMatrix(int rowsAmount, int columnsAmount)
+    {
+        var rand = new Random();
+
+        var matrixElements = new int[rowsAmount, columnsAmount];
+        for (int i = 0; i < rowsAmount; ++i)
+        {
+            for (int j = 0; j < columnsAmount; ++j)
+            {
+                matrixElements[i, j] = rand.Next();
+            }
+        }
+
+        return new Matrix(matrixElements);
     }
 }
