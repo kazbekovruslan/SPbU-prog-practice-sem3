@@ -6,7 +6,7 @@ class Program
     {
         if (args.Length != 1 && args.Length != 2)
         {
-            Console.WriteLine("Incorrect amount of arguments. Enter 'dotnet run --help' to see available arguments.");
+            Console.WriteLine("Incorrect amount of arguments. Enter 'dotnet run help' to see available arguments.");
         }
         else
         {
@@ -14,7 +14,22 @@ class Program
             {
                 if (args[0] == "help")
                 {
-                    // 4to-to
+                    Console.WriteLine("""
+
+                    This is program that multiplies two matrices commonly and in parallel
+
+                    ---------------------------------------------------------------------
+
+                    Usage:
+                    dotnet run 'path to first matrix' 'path to second matrix'
+                    
+                    ---------------------------------------------------------------------
+
+                    Output files:
+                    result.txt - result of multiplication of two matrices commonly
+                    result_parallel.txt - result of multiplication of two matrices in parallel
+
+                    """);
                 }
                 else if (args[0] == "benchmark")
                 {
