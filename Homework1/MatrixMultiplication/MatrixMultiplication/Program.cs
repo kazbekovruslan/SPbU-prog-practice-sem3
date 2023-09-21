@@ -34,7 +34,7 @@ class Program
                 else if (args[0] == "benchmark")
                 {
                     Console.WriteLine("Running benchmark...");
-                    MatrixBenchmark.WritingResultsOfBenchmarkingToFile();
+                    MatrixBenchmark.WriteResultsOfBenchmarkingToFile();
                     Console.WriteLine("Done!");
                 }
             }

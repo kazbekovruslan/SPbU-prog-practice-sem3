@@ -10,7 +10,7 @@ public static class MatrixBenchmark
 
     private const int AmountOfTestMeasurements = 5;
 
-    public static void WritingResultsOfBenchmarkingToFile()
+    public static void WriteResultsOfBenchmarkingToFile()
     {
         var dimensions = new int[AmountOfTestMeasurements] { 100, 200, 400, 800, 1600 };
         (double, double)[,] resultsOfBenchmarking = MatrixMultiplyBenchmark(dimensions);
