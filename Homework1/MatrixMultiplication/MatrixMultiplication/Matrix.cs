@@ -207,7 +207,7 @@ public class Matrix
     /// <returns>Matrix with given dimension and random numbers.</returns>
     public static Matrix GenerateRandomMatrix(int rowsAmount, int columnsAmount)
     {
-        var rand = new Random();
+        var rand = new Random(100);
 
         var matrixElements = new int[rowsAmount, columnsAmount];
         for (int i = 0; i < rowsAmount; ++i)
