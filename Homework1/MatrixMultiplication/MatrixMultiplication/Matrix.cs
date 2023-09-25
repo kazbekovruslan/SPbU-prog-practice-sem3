@@ -10,12 +10,14 @@ public class Matrix
     /// <summary>
     /// Amount of rows in matrix.
     /// </summary>
-    public int RowsAmount { get; }
+    public int RowsAmount
+        => MatrixElements.GetLength(0);
 
     /// <summary>
     /// Amount of columns in matrix.
     /// </summary>
-    public int ColumnsAmount { get; }
+    public int ColumnsAmount
+        => MatrixElements.GetLength(1);
 
     /// <summary>
     /// Two-dimensional array that contains rows of matrix.
@@ -23,10 +25,25 @@ public class Matrix
     public int[,] MatrixElements { get; }
 
     /// <summary>
-    /// Constructor of Matrix from file.
+    /// Constructor of Matrix from two-dimensional array.
     /// </summary>
     /// <param name="matrixElements">Matrix's elements.</param>
+    public Matrix(int[,] matrixElements)
+        => MatrixElements = (int[,])matrixElements.Clone();
+
+    /// <summary>
+    /// Constructor of Matrix from file.
+    /// </summary>
+    /// <param name="pathToFile">Path to file that contain matrix.</param>
     public Matrix(string pathToFile)
+        => MatrixElements = ReadMatrixFromFile(pathToFile);
+
+    /// <summary>
+    /// Reads matrix from file.
+    /// </summary>
+    /// <param name="pathToFile">Path to file that contain matrix.</param>
+    /// <returns>Two dimensional array - matrix.</returns>
+    public int[,] ReadMatrixFromFile(string pathToFile)
     {
         if (!File.Exists(pathToFile))
         {
@@ -59,8 +76,6 @@ public class Matrix
         }
 
         var matrixElements = new int[rowsAmount, columnsAmount];
-        ColumnsAmount = columnsAmount;
-        RowsAmount = rowsAmount;
         for (var i = 0; i < rowsAmount; ++i)
         {
             for (var j = 0; j < columnsAmount; ++j)
@@ -69,18 +84,7 @@ public class Matrix
             }
         }
 
-        MatrixElements = matrixElements;
-    }
-
-    /// <summary>
-    /// Constructor of Matrix from two-dimensional array.
-    /// </summary>
-    /// <param name="matrixElements">Matrix's elements.</param>
-    public Matrix(int[,] matrixElements)
-    {
-        MatrixElements = (int[,])matrixElements.Clone();
-        RowsAmount = matrixElements.GetLength(0);
-        ColumnsAmount = matrixElements.GetLength(1);
+        return matrixElements;
     }
 
     /// <summary>
@@ -121,10 +125,8 @@ public class Matrix
         {
             for (int j = 0; j < secondMatrix.ColumnsAmount; ++j)
             {
-                for (int k = 0; k < firstMatrix.ColumnsAmount; ++k)
-                {
-                    newMatrix[i, j] += firstMatrix.MatrixElements[i, k] * secondMatrix.MatrixElements[k, j];
-                }
+                newMatrix[i, j] = Enumerable.Range(0, firstMatrix.ColumnsAmount).
+                Sum(k => firstMatrix.MatrixElements[i, k] * secondMatrix.MatrixElements[k, j]);
             }
         }
 
@@ -146,22 +148,29 @@ public class Matrix
 
         var newMatrix = new int[firstMatrix.RowsAmount, secondMatrix.ColumnsAmount];
 
-        var threads = new Thread[firstMatrix.ColumnsAmount];
-        for (int i = 0; i < firstMatrix.RowsAmount; ++i)
+        var processorAmount = Environment.ProcessorCount;
+        var threads = new Thread[processorAmount];
+
+        int blockSize = firstMatrix.RowsAmount / processorAmount;
+        for (int i = 0; i < processorAmount; i++)
         {
-            var local = i;
+            int rowStart = i * blockSize;
+            int rowEnd = (i == processorAmount - 1) ? firstMatrix.RowsAmount : rowStart + blockSize;
+
             threads[i] = new Thread(() =>
             {
-                for (int j = 0; j < secondMatrix.ColumnsAmount; ++j)
+                for (int j = rowStart; j < rowEnd; j++)
                 {
-                    var sumForElement = 0;
-                    for (int k = 0; k < firstMatrix.ColumnsAmount; ++k)
+                    for (int k = 0; k < secondMatrix.ColumnsAmount; k++)
                     {
-                        sumForElement += firstMatrix.MatrixElements[local, k] * secondMatrix.MatrixElements[k, j];
+                        for (int l = 0; l < firstMatrix.ColumnsAmount; l++)
+                        {
+                            newMatrix[j, k] += firstMatrix.MatrixElements[j, l] * secondMatrix.MatrixElements[l, k];
+                        }
                     }
-                    newMatrix[local, j] = sumForElement;
                 }
             });
+
             threads[i].Start();
         }
 
@@ -173,6 +182,7 @@ public class Matrix
         return new Matrix(newMatrix);
     }
 
+
     /// <summary>
     /// Checks if two matrices are equal.
     /// </summary>
@@ -180,6 +190,16 @@ public class Matrix
     /// <returns>true - if matrices are equal; false - if matrices aren't equal.</returns>
     public bool IsEqualTo(Matrix otherMatrix)
     {
+        if (System.Object.ReferenceEquals(this, otherMatrix))
+        {
+            return true;
+        }
+
+        if (otherMatrix == null)
+        {
+            return false;
+        }
+
         if (RowsAmount != otherMatrix.RowsAmount || ColumnsAmount != otherMatrix.ColumnsAmount)
         {
             return false;
