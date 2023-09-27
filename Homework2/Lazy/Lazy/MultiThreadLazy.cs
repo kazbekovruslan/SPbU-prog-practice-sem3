@@ -1,5 +1,9 @@
 namespace Lazy;
 
+/// <summary>
+/// Class that represents multi thread version of Lazy interface.
+/// </summary>
+/// <typeparam name="T">Generic type of result of calculating.</typeparam>
 public class MultiThreadLazy<T> : ILazy<T>
 {
     private Func<T>? supplier;
@@ -8,6 +12,10 @@ public class MultiThreadLazy<T> : ILazy<T>
     private Exception? thrownException;
     private readonly object lockObject;
 
+    /// <summary>
+    /// Standard constructor for MultiThreadLazy class.
+    /// </summary>
+    /// <param name="supplier">Function that calculate the result.</param>
     public MultiThreadLazy(Func<T> supplier)
     {
         this.supplier = supplier ?? throw new ArgumentException("Supplier can't be null!");
@@ -15,6 +23,7 @@ public class MultiThreadLazy<T> : ILazy<T>
         this.isResultReady = false;
     }
 
+    /// <inheritdoc/>
     public T? Get()
     {
         if (thrownException != null)
