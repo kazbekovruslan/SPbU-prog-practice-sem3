@@ -9,7 +9,7 @@ public class SingleThreadLazy<T> : ILazy<T>
 
     public SingleThreadLazy(Func<T> supplier)
     {
-        this.supplier = supplier;
+        this.supplier = supplier ?? throw new ArgumentException("Supplier can't be null!");
         this.isResultReady = false;
     }
 
@@ -18,11 +18,6 @@ public class SingleThreadLazy<T> : ILazy<T>
         if (thrownException != null)
         {
             throw thrownException;
-        }
-
-        if (supplier == null)
-        {
-            throw new InvalidOperationException("Supplier can't be null!");
         }
 
         if (!isResultReady)

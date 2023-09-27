@@ -10,7 +10,7 @@ public class MultiThreadLazy<T> : ILazy<T>
 
     public MultiThreadLazy(Func<T> supplier)
     {
-        this.supplier = supplier;
+        this.supplier = supplier ?? throw new ArgumentException("Supplier can't be null!");
         this.lockObject = new object();
         this.isResultReady = false;
     }
@@ -20,11 +20,6 @@ public class MultiThreadLazy<T> : ILazy<T>
         if (thrownException != null)
         {
             throw thrownException;
-        }
-
-        if (supplier == null)
-        {
-            throw new InvalidOperationException("Supplier can't be null!");
         }
 
         // for not to lock if you don't need to
