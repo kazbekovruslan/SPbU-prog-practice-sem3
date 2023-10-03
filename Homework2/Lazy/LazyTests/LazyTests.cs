@@ -16,13 +16,11 @@ public class Tests
     {
         yield return new TestCaseData(new SingleThreadLazy<int>(() =>
         {
-            CounterOfCalls = 0;
             ++CounterOfCalls;
             return 0;
         }));
         yield return new TestCaseData(new MultiThreadLazy<int>(() =>
         {
-            CounterOfCalls = 0;
             ++CounterOfCalls;
             return 0;
         }));
@@ -53,6 +51,7 @@ public class Tests
     [TestCaseSource(nameof(LaziesWithCounterInSupplier))]
     public void SupplierShouldBeEvaluatedOnlyOnce(ILazy<int> lazy)
     {
+        CounterOfCalls = 0;
         lazy.Get();
         lazy.Get();
         Assert.That(CounterOfCalls, Is.EqualTo(1));
