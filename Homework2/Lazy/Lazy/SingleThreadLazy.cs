@@ -6,7 +6,7 @@ namespace Lazy;
 /// <typeparam name="T">Generic type of result of calculating.</typeparam>
 public class SingleThreadLazy<T> : ILazy<T>
 {
-    private Func<T>? supplier;
+    private Func<T?>? supplier;
     private T? result;
     private bool isResultReady;
     private Exception? thrownException;
