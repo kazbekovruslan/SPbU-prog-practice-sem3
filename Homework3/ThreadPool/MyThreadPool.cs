@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Diagnostics;
+﻿using System.Collections.Concurrent;
 
 namespace MyThreadPool;
 
+/// <summary>
+/// Class that represents Thread Pool instances.
+/// </summary>
 public class MyThreadPool
 {
     private readonly Thread[] threads;
@@ -11,6 +12,10 @@ public class MyThreadPool
     private BlockingCollection<Action> tasks;
     private object lockObject;
 
+    /// <summary>
+    /// Default constructor.
+    /// </summary>
+    /// <param name="threadAmount">Amount of threads that will be made in thread pool.</param>
     public MyThreadPool(int threadAmount)
     {
         if (threadAmount < 1)
@@ -41,6 +46,12 @@ public class MyThreadPool
         }
     }
 
+    /// <summary>
+    /// Adds a new task to the pool.
+    /// </summary>
+    /// <param name="function">Task's function.</param>
+    /// <typeparam name="TResult">Function's return type.</typeparam>
+    /// <returns>Made task.</returns>
     public IMyTask<TResult> Submit<TResult>(Func<TResult> function)
     {
         if (cancellationTokenSource.IsCancellationRequested)
@@ -57,6 +68,9 @@ public class MyThreadPool
         }
     }
 
+    /// <summary>
+    /// Shuts down the thread pool.
+    /// </summary>
     public void Shutdown()
     {
         lock (lockObject)
@@ -72,7 +86,7 @@ public class MyThreadPool
         }
     }
 
-    public class MyTask<TResult> : IMyTask<TResult>
+    private class MyTask<TResult> : IMyTask<TResult>
     {
         private volatile bool isCompleted;
         private TResult? result;
@@ -83,6 +97,11 @@ public class MyThreadPool
         private readonly ManualResetEvent resultIsCompletedEvent;
         private ConcurrentQueue<Action> continuationTasks;
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="taskFunction">Task's function.</param>
+        /// <param name="threadPool">Thread pool where task was added.</param>
         public MyTask(Func<TResult> taskFunction, MyThreadPool threadPool)
         {
             this.taskFunction = taskFunction;
@@ -93,8 +112,10 @@ public class MyThreadPool
             continuationTasks = new ConcurrentQueue<Action>();
         }
 
+        /// <inheritdoc/>
         public bool IsCompleted => isCompleted;
 
+        /// <inheritdoc/>
         public TResult? Result
         {
             get
@@ -113,6 +134,9 @@ public class MyThreadPool
             }
         }
 
+        /// <summary>
+        /// Computes the result of the task's function.
+        /// </summary>
         public void ComputeResult()
         {
             lock (taskLockObject)
@@ -141,6 +165,7 @@ public class MyThreadPool
             }
         }
 
+        /// <inheritdoc/>
         public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult?, TNewResult> function)
         {
             if (threadPool.cancellationTokenSource.IsCancellationRequested)
