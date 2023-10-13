@@ -4,13 +4,12 @@ using System.Diagnostics;
 
 namespace MyThreadPool;
 
-class MyThreadPool
+public class MyThreadPool
 {
     private readonly Thread[] threads;
     private CancellationTokenSource cancellationTokenSource;
     private BlockingCollection<Action> tasks;
     private object lockObject;
-
 
     public MyThreadPool(int threadAmount)
     {
@@ -73,32 +72,92 @@ class MyThreadPool
         }
     }
 
-    private class MyTask<TResult> : IMyTask<TResult>
+    public class MyTask<TResult> : IMyTask<TResult>
     {
-        private bool isCompleted;
+        private volatile bool isCompleted;
         private TResult? result;
         private readonly Func<TResult> taskFunction;
-        private readonly Exception? taskFuncException;
+        private Exception? taskFuncException;
         private readonly MyThreadPool threadPool;
+        private readonly object taskLockObject;
+        private readonly ManualResetEvent resultIsCompletedEvent;
+        private ConcurrentQueue<Action> continuationTasks;
 
         public MyTask(Func<TResult> taskFunction, MyThreadPool threadPool)
         {
             this.taskFunction = taskFunction;
             this.threadPool = threadPool;
             isCompleted = false;
+            taskLockObject = new object();
+            resultIsCompletedEvent = new ManualResetEvent(false);
+            continuationTasks = new ConcurrentQueue<Action>();
         }
+
         public bool IsCompleted => isCompleted;
 
         public TResult? Result
         {
+            get
+            {
+                if (!isCompleted)
+                {
+                    resultIsCompletedEvent.WaitOne();
+                }
+
+                if (taskFuncException != null)
+                {
+                    throw new AggregateException(taskFuncException);
+                }
+
+                return result;
+            }
         }
 
         public void ComputeResult()
         {
+            lock (taskLockObject)
+            {
+                try
+                {
+                    result = taskFunction();
+                }
+                catch (Exception ex)
+                {
+                    taskFuncException = ex;
+                }
+                finally
+                {
+                    isCompleted = true;
+                    resultIsCompletedEvent.Set();
+
+                    while (!continuationTasks.IsEmpty)
+                    {
+                        if (continuationTasks.TryDequeue(out var result))
+                        {
+                            threadPool.tasks.Add(result);
+                        }
+                    }
+                }
+            }
         }
 
-        public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> function)
+        public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult?, TNewResult> function)
         {
+            if (threadPool.cancellationTokenSource.IsCancellationRequested)
+            {
+                throw new InvalidOperationException();
+            }
+
+            lock (taskLockObject)
+            {
+                if (isCompleted)
+                {
+                    return threadPool.Submit(() => function(Result));
+                }
+                var continuation = new MyTask<TNewResult>(() => function(Result), threadPool);
+                continuationTasks.Enqueue(continuation.ComputeResult);
+                return continuation;
+            }
         }
     }
 }

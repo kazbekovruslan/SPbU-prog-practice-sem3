@@ -1,10 +1,10 @@
 namespace MyThreadPool;
 
-interface IMyTask<TResult>
+public interface IMyTask<TResult>
 {
     public bool IsCompleted { get; }
 
-    public TResult Result { get; }
+    public TResult? Result { get; }
 
-    public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> function);
+    public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult?, TNewResult> function);
 }
