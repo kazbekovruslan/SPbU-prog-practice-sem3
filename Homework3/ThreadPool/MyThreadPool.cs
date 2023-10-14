@@ -77,7 +77,6 @@ public class MyThreadPool
         {
             cancellationTokenSource.Cancel();
             tasks.CompleteAdding();
-            // tasks.IsAddingCompleted
         }
 
         foreach (var thread in threads)
