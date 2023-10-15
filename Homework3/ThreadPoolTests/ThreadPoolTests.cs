@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace ThreadPoolTests;
 
 public class MyThreadPoolTests
@@ -46,7 +44,7 @@ public class MyThreadPoolTests
     }
 
     [Test]
-    public void ContinueWithAfterShutDown()
+    public void ContinueWithAfterShutDown_ShouldThrowException()
     {
         var task = myThreadPool.Submit(() => 1);
         myThreadPool.Shutdown();
