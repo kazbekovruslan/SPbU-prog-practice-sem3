@@ -24,7 +24,7 @@ class Program
             {
                 Console.WriteLine("Socket error!");
             }
-            catch (IOException)
+            catch (ObjectDisposedException)
             {
                 Console.WriteLine("Session is closed!");
             }
@@ -52,7 +52,7 @@ class Program
             {
                 Console.WriteLine("Socket error!");
             }
-            catch (IOException)
+            catch (ObjectDisposedException)
             {
                 Console.WriteLine("Session is closed!");
             }

@@ -13,17 +13,17 @@ public class Client
 
     public async Task Run()
     {
-        Get(client.GetStream());
+        using var stream = client.GetStream();
+        GetMessage(stream);
         Console.WriteLine("Connection is established!");
-        await Send(client.GetStream());
+        await SendMessage(stream);
     }
 
-    private void Get(NetworkStream stream)
+    private void GetMessage(NetworkStream stream)
     {
         Task.Run(async () =>
         {
-            var reader = new StreamReader(stream);
-
+            using var reader = new StreamReader(stream);
             var data = await reader.ReadLineAsync();
             while (data != "exit")
             {
@@ -36,7 +36,7 @@ public class Client
         });
     }
 
-    private Task Send(NetworkStream stream)
+    private Task SendMessage(NetworkStream stream)
     {
         return Task.Run(async () =>
         {
@@ -48,6 +48,7 @@ public class Client
                 await writer.WriteLineAsync(data);
                 data = Console.ReadLine();
             }
+            await writer.WriteLineAsync(data);
 
             Console.WriteLine("Connection is closed!");
             client.Close();

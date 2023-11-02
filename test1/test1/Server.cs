@@ -16,16 +16,16 @@ public class Server
         listener.Start();
         var client = await listener.AcceptTcpClientAsync();
         Console.WriteLine("Connection is established!");
-        Get(client.GetStream());
-        await Send(client.GetStream());
+        using var stream = client.GetStream();
+        GetMessage(stream);
+        await SendMessage(stream);
     }
 
-    private void Get(NetworkStream stream)
+    private void GetMessage(NetworkStream stream)
     {
         Task.Run(async () =>
                 {
-                    var reader = new StreamReader(stream);
-
+                    using var reader = new StreamReader(stream);
                     var data = await reader.ReadLineAsync();
                     while (data != "exit")
                     {
@@ -38,7 +38,7 @@ public class Server
                 });
     }
 
-    private Task Send(NetworkStream stream)
+    private Task SendMessage(NetworkStream stream)
     {
         return Task.Run(async () =>
                 {
@@ -50,6 +50,7 @@ public class Server
                         await writer.WriteLineAsync(data);
                         data = Console.ReadLine();
                     }
+                    await writer.WriteLineAsync(data);
 
                     Console.WriteLine("Connection is closed!");
                     listener.Stop();
