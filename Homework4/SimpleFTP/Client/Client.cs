@@ -45,9 +45,14 @@ public class Client
 
         var responseArray = response.Split(" ", 2);
         var size = responseArray[0];
-        var content = responseArray[1];
 
-        await File.WriteAllBytesAsync($"{path}", Encoding.UTF8.GetBytes(content));
+        if (responseArray.Length > 1)
+        {
+            var content = responseArray[1];
+            Directory.CreateDirectory("downloads");
+            var nameOfFile = path.Split("/").Last();
+            await File.WriteAllBytesAsync($"downloads/{nameOfFile}", Encoding.UTF8.GetBytes(content));
+        }
 
         return size;
     }

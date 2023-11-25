@@ -1,15 +1,12 @@
-using System.ComponentModel;
-using System.Dynamic;
 using System.Net.Sockets;
-using System.Text;
 
 namespace SimpleFTP;
 
 public class Server
 {
-    private TcpListener listener;
-    private int port;
-    private CancellationTokenSource cancellationTokenSource;
+    private readonly TcpListener listener;
+    private readonly int port;
+    private readonly CancellationTokenSource cancellationTokenSource;
 
     public Server(int port)
     {
@@ -49,7 +46,7 @@ public class Server
     {
         if (!File.Exists(path))
         {
-            await writer.WriteLineAsync("-1");
+            await writer.WriteAsync("-1");
             return;
         }
 
@@ -58,15 +55,13 @@ public class Server
         var size = new FileInfo(path).Length;
         await writer.WriteAsync($"{size} ");
         await content.CopyToAsync(writer.BaseStream);
-
-        // await writer.WriteLineAsync();
     }
 
     private static async Task List(string path, StreamWriter writer)
     {
         if (!Directory.Exists(path))
         {
-            await writer.WriteLineAsync("-1");
+            await writer.WriteAsync("-1");
             return;
         }
 

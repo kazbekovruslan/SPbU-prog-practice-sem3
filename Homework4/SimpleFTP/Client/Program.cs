@@ -34,17 +34,20 @@ class Program
             var client = new Client(ip, port);
             var path = args[3];
 
-            // args.ToList().ForEach(Console.WriteLine);
-
             switch (args[2])
             {
                 case "1":
-                    var response = await client.List(path);
-                    Console.WriteLine(response);
+                    var responseFromList = await client.List(path);
+                    Console.WriteLine(responseFromList);
                     break;
                 case "2":
-                    var response1 = await client.Get(path);
-                    Console.WriteLine($"Size: {response1}\nYour file has been downloaded successfully to a directory 'downloads'!");
+                    var responseFromGet = await client.Get(path);
+                    if (responseFromGet == "-1")
+                    {
+                        Console.WriteLine("File doesn't exist!");
+                        return;
+                    }
+                    Console.WriteLine($"Size: {responseFromGet}\nYour file has been downloaded successfully!");
                     break;
                 default:
                     printHelp();
