@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using System.Text;
 
 namespace SimpleFTP;
 
@@ -59,12 +60,8 @@ public class Server
             await writer.WriteAsync("-1");
             return;
         }
-
-        using var content = File.OpenRead(path);
-
-        var size = new FileInfo(path).Length;
-        await writer.WriteAsync($"{size} ");
-        await content.CopyToAsync(writer.BaseStream);
+        var content = await File.ReadAllBytesAsync(path);
+        await writer.WriteAsync($"{content.Length} {Encoding.UTF8.GetString(content)}");
     }
 
     private static async Task List(string path, StreamWriter writer)
