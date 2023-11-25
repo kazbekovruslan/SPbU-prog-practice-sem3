@@ -34,11 +34,11 @@ public class Server
             {
                 if (data[..2] == "1 ")
                 {
-                    await Get(data[2..], writer);
+                    await List(data[2..], writer);
                 }
                 if (data[..2] == "2 ")
                 {
-                    await List(data[2..], writer);
+                    await Get(data[2..], writer);
                 }
             }
         }
