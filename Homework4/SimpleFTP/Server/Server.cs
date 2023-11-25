@@ -20,26 +20,36 @@ public class Server
         listener.Start();
         Console.WriteLine("Server started.");
 
+        var tasks = new List<Task>();
+
         while (!cancellationTokenSource.IsCancellationRequested)
         {
             var client = await listener.AcceptTcpClientAsync(cancellationTokenSource.Token);
-            using var stream = client.GetStream();
-            using var reader = new StreamReader(stream);
-            using var writer = new StreamWriter(stream) { AutoFlush = true };
 
-            var data = await reader.ReadLineAsync();
-            if (data != null)
-            {
-                if (data[..2] == "1 ")
+            tasks.Add(Task.Run(
+                async () =>
                 {
-                    await List(data[2..], writer);
+                    using var stream = client.GetStream();
+                    using var reader = new StreamReader(stream);
+                    using var writer = new StreamWriter(stream) { AutoFlush = true };
+
+                    var data = await reader.ReadLineAsync();
+                    if (data != null)
+                    {
+                        if (data[..2] == "1 ")
+                        {
+                            await List(data[2..], writer);
+                        }
+                        if (data[..2] == "2 ")
+                        {
+                            await Get(data[2..], writer);
+                        }
+                    }
                 }
-                if (data[..2] == "2 ")
-                {
-                    await Get(data[2..], writer);
-                }
-            }
+            ));
         }
+
+        await Task.WhenAll(tasks);
     }
 
     private static async Task Get(string path, StreamWriter writer)
@@ -74,5 +84,11 @@ public class Server
             await writer.WriteAsync($" {entry} {Directory.Exists(entry)}");
         }
         await writer.WriteAsync("\n");
+    }
+
+    public void Stop()
+    {
+        cancellationTokenSource.Cancel();
+        listener.Stop();
     }
 }
