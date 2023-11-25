@@ -23,7 +23,7 @@ class Program
     {
         if (args.Length == 4)
         {
-            if (!IPAddress.TryParse(args[0], out var _) || !int.TryParse(args[1], out var port)
+            if (!IPAddress.TryParse(args[0], out _) || !int.TryParse(args[1], out var port)
             || port < 0 || port > 65536)
             {
                 printHelp();
@@ -43,7 +43,8 @@ class Program
                     Console.WriteLine(response);
                     break;
                 case "2":
-
+                    var response1 = await client.Get(path);
+                    Console.WriteLine($"Size: {response1}\nYour file has been downloaded successfully to a directory 'downloads'!");
                     break;
                 default:
                     printHelp();

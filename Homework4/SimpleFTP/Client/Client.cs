@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using System.Text;
 
 namespace SimpleFTP;
 
@@ -42,6 +43,12 @@ public class Client
         await writer.WriteLineAsync($"2 {path}");
         var response = await reader.ReadToEndAsync();
 
-        return response;
+        var responseArray = response.Split(" ", 2);
+        var size = responseArray[0];
+        var content = responseArray[1];
+
+        await File.WriteAllBytesAsync($"{path}", Encoding.UTF8.GetBytes(content));
+
+        return size;
     }
 }
