@@ -3,12 +3,19 @@ using System.Text;
 
 namespace SimpleFTP;
 
+/// <summary>
+/// Represents a server for a simple-FTP protocol connection.
+/// </summary>
 public class Server
 {
     private readonly TcpListener listener;
     private readonly int port;
     private readonly CancellationTokenSource cancellationTokenSource;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Server"/> class.
+    /// </summary>
+    /// <param name="port">The port number to listen on.</param>
     public Server(int port)
     {
         this.port = port;
@@ -16,6 +23,10 @@ public class Server
         this.cancellationTokenSource = new CancellationTokenSource();
     }
 
+    /// <summary>
+    /// Starts the server and begins listening for client connections.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public async Task Run()
     {
         listener.Start();
@@ -83,6 +94,9 @@ public class Server
         await writer.WriteAsync("\n");
     }
 
+    /// <summary>
+    /// Stops the server and stops listening for client connections.
+    /// </summary>
     public void Stop()
     {
         cancellationTokenSource.Cancel();
