@@ -36,7 +36,7 @@ public class Tests
         }
         else
         {
-            expected = "1 filestest.txt\n";
+            expected = "1 files/test.txt\n";
         }
 
         Assert.That(actual, Is.EqualTo(expected));
