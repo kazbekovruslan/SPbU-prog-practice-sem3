@@ -28,7 +28,16 @@ public class Tests
     public async Task ListShouldReturnRightAnswer()
     {
         var actual = await client.List("files");
-        var expected = "1 files\\test.txt False\n";
+        string expected;
+
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        {
+            expected = "1 files\\test.txt False\n";
+        }
+        else
+        {
+            expected = "1 filestest.txt\n";
+        }
 
         Assert.That(actual, Is.EqualTo(expected));
     }
