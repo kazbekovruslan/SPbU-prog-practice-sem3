@@ -26,12 +26,12 @@ class Program
             stopwatch.Start();
             var checkSumSingleThread = CheckSum.ComputeCheckSum(args[0]);
             stopwatch.Stop();
+            Console.WriteLine($"Single thread: Time - {stopwatch.Elapsed.TotalSeconds}");
 
             stopwatch.Reset();
             stopwatch.Start();
             var checkSumMultiThread = CheckSum.ComputeCheckSumParallel(args[0]);
             stopwatch.Stop();
-            Console.WriteLine($"Single thread: Time - {stopwatch.Elapsed.TotalSeconds}");
             Console.WriteLine($"Multi thread: Time - {stopwatch.Elapsed.TotalSeconds}");
         }
         catch (DirectoryNotFoundException)
