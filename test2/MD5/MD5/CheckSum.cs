@@ -89,6 +89,11 @@ public static class CheckSum
         return resultByteArray;
     }
 
+    /// <summary>
+    /// Computes check-sum for a file or directory in parallel.
+    /// </summary>
+    /// <param name="path">The path to the file or directory.</param>
+    /// <returns>The check-sum of the file or directory.</returns>
     public static byte[] ComputeCheckSumParallel(string path)
     {
         if (!Directory.Exists(path) && !File.Exists(path))
