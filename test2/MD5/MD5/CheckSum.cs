@@ -89,4 +89,47 @@ public static class CheckSum
         return resultByteArray;
     }
 
+    public static byte[] ComputeCheckSumParallel(string path)
+    {
+        if (!Directory.Exists(path) && !File.Exists(path))
+        {
+            throw new DirectoryNotFoundException();
+        }
+
+        // just file
+        if (File.Exists(path))
+        {
+            var resultFileHash = ComputeFileHash(path);
+            return resultFileHash;
+        }
+
+        // directory
+        var resultHash = ComputeDirectoryEntriesHashParallel(path);
+        return resultHash;
+    }
+
+    private static byte[] ComputeDirectoryEntriesHashParallel(string path)
+    {
+        using var md5 = System.Security.Cryptography.MD5.Create();
+        var subdirectories = Directory.GetDirectories(path);
+        var filesInDirectory = Directory.GetFiles(path);
+        var fileHashes = new byte[filesInDirectory.Length][];
+        var directoryHashes = new byte[subdirectories.Length][];
+
+        Array.Sort(subdirectories);
+        Array.Sort(filesInDirectory);
+
+        Parallel.For(0, fileHashes.Length, (i) =>
+        {
+            fileHashes[i] = ComputeFileHash(filesInDirectory[i]);
+        });
+
+        Parallel.For(0, directoryHashes.Length, (i) =>
+        {
+            directoryHashes[i] = ComputeDirectoryEntriesHashParallel(subdirectories[i]);
+        });
+
+        var resultHash = ConcatenateHashesAndNameOfDirectory(fileHashes.Concat(directoryHashes).ToList(), path);
+        return resultHash;
+    }
 }
