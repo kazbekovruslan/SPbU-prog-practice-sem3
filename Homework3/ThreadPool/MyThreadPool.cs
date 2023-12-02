@@ -144,21 +144,18 @@ public class MyThreadPool
                 {
                     result = taskFunction();
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    taskFuncException = ex;
+                    taskFuncException = e;
                 }
                 finally
                 {
                     isCompleted = true;
                     resultIsCompletedEvent.Set();
 
-                    while (!continuationTasks.IsEmpty)
+                    foreach (var task in continuationTasks)
                     {
-                        if (continuationTasks.TryDequeue(out var result))
-                        {
-                            threadPool.tasks.Add(result);
-                        }
+                        threadPool.tasks.Add(task);
                     }
                 }
             }
